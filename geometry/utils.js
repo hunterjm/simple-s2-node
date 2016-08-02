@@ -1,11 +1,12 @@
 'use strict'
 const bignum = require('bn').BigInteger;
 const Long = require('long');
+const Point = require('./point');
 
 const lowMask = new bignum('ffffffff', 16);
 
 class Utils {
-	
+
 	toRadians(degrees) {
 		return degrees * Math.PI / 180;
 	}
@@ -32,6 +33,23 @@ class Utils {
 			face += 3;
 		var uv = this.valid_face_xyz_to_uv(face, point);
 		return [face].concat(uv);
+	}
+
+	face_uv_to_xyz(face, u, v) {
+		switch (face) {
+		case 0:
+			return new Point(1, u, v);
+		case 1:
+			return new Point(-u, 1, v);
+		case 2:
+			return new Point(-u, -v, 1);
+		case 3:
+			return new Point(-1, -v, -u);
+		case 4:
+			return new Point(v, -1, -u);
+		default:
+			return new Point(v, u, -1);
+		}
 	}
 
 	long_from_bignum(bignum, signed) {
