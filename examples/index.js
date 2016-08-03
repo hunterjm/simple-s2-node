@@ -32,16 +32,35 @@ function getNeighbors(lat, lng) {
 
 // console.log(getNeighbors(lat, lng));
 
-function getEdgeNeighbors(cell, walk, recurse) {
+function getEdgeNeighbors(cell, walk, recurse, direction) {
 	if(!recurse) recurse = 0;
 	if(!walk) walk = [];
 	walk.push(cell.id().toString());
 	if(recurse < 3) {
 		recurse++;
+    // Edges 0, 1, 2, 3 are in the down, right, up, left directions in the face space.
 		neighbors = cell.edgeNeighbors();
+    var i = 0;
 		for (const neighbor of neighbors) {
-			getEdgeNeighbors(neighbor, walk, recurse);
+      if(recurse !== 3 || i !== direction) {
+	      getEdgeNeighbors(neighbor, walk, recurse, i);
+      }
+      i++;
 		}
+	}
+	// unique
+	walk = walk.reduce(function(p, c) {
+		if(p.indexOf(c) === -1) p.push(c);
+		return p;
+	}, []);
+	return walk;
+}
+
+function edgeNeighbors(cell) {
+	var walk = [cell.id().toString()];
+	neighbors = cell.edgeNeighbors();
+	for (const neighbor of neighbors) {
+		getEdgeNeighbors(neighbor, walk, recurse);
 	}
 	// unique
 	walk = walk.reduce(function(p, c) {
