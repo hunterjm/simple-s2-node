@@ -73,10 +73,6 @@ function uv_to_st(u) {
 	throw 'unknown projection type';
 };
 
-function st_to_ij(s) {
-	return Math.max(0, Math.min(MAX_SIZE - 1, Math.floor(MAX_SIZE * s)));
-};
-
 // clamp returns number closest to x within the range min..max.
 function clamp(x, min, max) {
 	if (x < min) {
@@ -87,6 +83,10 @@ function clamp(x, min, max) {
 	}
 	return x;
 }
+
+function st_to_ij(s) {
+	return clamp(Math.floor(MAX_SIZE * s), 0, MAX_SIZE - 1);
+};
 
 class CellId {
 	constructor(cellId){
@@ -244,12 +244,13 @@ class CellId {
 		var f = this.face().intValue();
 		var i = 0;
 		var j = 0;
+		var tj;
 		var orientation = f & SWAP_MASK;
 		var nbits = MAX_LEVEL - 7 * LOOKUP_BITS // first iteration
 
 		for (var k = 7; k >= 0; k--) {
 			// (int(uint64(ci)>>uint64(k*2*lookupBits+1)) & ((1 << uint((2 * nbits))) - 1)) << 2
-			orientation += (Math.abs(this.id().shiftRight(k * 2 * LOOKUP_BITS + 1).intValue()) & ((1 << (2 * nbits)) - 1)) << 2;
+			orientation += (this.id().shiftRight(k * 2 * LOOKUP_BITS + 1).intValue() & ((1 << (2 * nbits)) - 1)) << 2;
 			orientation = LOOKUP_IJ[orientation];
 			i += (orientation >> (LOOKUP_BITS + 2)) << (k * LOOKUP_BITS);
 			// ((orientation >> 2) & ((1 << LOOKUP_BITS) - 1)) << (k * LOOKUP_BITS);
@@ -332,7 +333,7 @@ class CellId {
 		// [-1,1]x[-1,1] face rectangle, since otherwise the reprojection step
 		// (which divides by the new z coordinate) might change the other
 		// coordinates enough so that we end up in the wrong leaf cell.
-		const scale = 1.0 / MAX_SIZE;
+		const scale = 1 / MAX_SIZE;
 		var limit = 1.0000000000000002; //limit := math.Nextafter(1, 2)
 		var u = Math.max(-limit, Math.min(limit, scale*((i<<1)+1-MAX_SIZE)));
 		var v = Math.max(-limit, Math.min(limit, scale*((j<<1)+1-MAX_SIZE)));

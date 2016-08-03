@@ -5,14 +5,14 @@ var lat = 35.2271329;
 var lng = -80.8430872;
 lat = 40.758895;
 lng = -73.9873197;
-lat = 51.501364;
-lng = -0.1440787;
-lat = -33.8479743;
-lng = 150.6517864;
-lat = 44.971647;
-lng = -93.329115;
-lat = 35.111631;
-lng = -81.0029286;
+// lat = 51.501364;
+// lng = -0.1440787;
+// lat = -33.8479743;
+// lng = 150.6517864;
+// lat = 44.971647;
+// lng = -93.329115;
+// lat = 35.111631;
+// lng = -81.0029286;
 
 function getNeighbors(lat, lng) {
   var origin = new s2.S2CellId().from_lat_lng(new s2.S2LatLng().from_degrees(lat, lng)).parent(15);
@@ -39,8 +39,8 @@ function getEdgeNeighbors(cell, walk, recurse) {
 	if(recurse < 3) {
 		recurse++;
 		neighbors = cell.edgeNeighbors();
-		for (var i = 0; i < neighbors.length; i++) {
-			getEdgeNeighbors(neighbors[i], walk, recurse);
+		for (const neighbor of neighbors) {
+			getEdgeNeighbors(neighbor, walk, recurse);
 		}
 	}
 	// unique
@@ -51,6 +51,7 @@ function getEdgeNeighbors(cell, walk, recurse) {
 	return walk;
 }
 
+// var origin = new s2.S2CellId(new bignum("9926593617487462400"));
 var origin = new s2.S2CellId().from_lat_lng(new s2.S2LatLng().from_degrees(lat, lng)).parent(15);
 console.log(getEdgeNeighbors(origin));
 
